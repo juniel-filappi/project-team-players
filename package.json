@@ -3,7 +3,8 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "tsc && vite build && vite build --ssr"
+        "build": "tsc && vite build && vite build --ssr",
+        "postinstall": "npm run prod"
     },
     "devDependencies": {
         "@headlessui/react": "^1.4.2",
