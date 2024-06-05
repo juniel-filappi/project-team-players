@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CreatePlayerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::group(['prefix' => 'players'], function () {
+        Route::get('/', function () {
+            return Inertia::render('Players/Index');
+        })->name('players.index');
+        Route::get('/create', [CreatePlayerController::class, 'view'])->name('players.create');
+        Route::post('/create', [CreatePlayerController::class, 'store'])->name('players.store');
+    });
 });
 
 require __DIR__.'/auth.php';
