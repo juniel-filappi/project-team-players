@@ -1,21 +1,55 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import Table from "@/Components/Table";
 import PrimaryButton from "@/Components/PrimaryButton";
+import { Player } from "@/interfaces/Player";
+import { format } from "date-fns";
+import { PLAYER_LEVELS_MAP } from "@/variables/PlayerVariables";
 
-export default function Index({ auth }: PageProps) {
-    const headers = ['Name', 'Title', 'Status', 'Role', 'Created At'];
-    const rows = [
-        ['John Doe', 'Software Engineer', 'Active', 'Admin', '2021-08-01'],
-        ['Jane Doe', 'Software Engineer', 'Active', 'Admin', '2021-08-01'],
-        ['John Smith', 'Software Engineer', 'Active', 'Admin', '2021-08-01'],
-        ['Jane Smith', 'Software Engineer', 'Active', 'Admin', '2021-08-01'],
-        ['John Doe', 'Software Engineer', 'Active', 'Admin', '2021-08-01'],
-        ['Jane Doe', 'Software Engineer', 'Active', 'Admin', '2021-08-01'],
-        ['John Smith', 'Software Engineer', 'Active', 'Admin', '2021-08-01'],
-        ['Jane Smith', 'Software Engineer', 'Active', 'Admin', '2021-08-01'],
+export default function Index({ auth, players }: PageProps<{ players: Player[] }>) {
+    const headers = [
+        {
+            field: 'name',
+            headerName: 'Name',
+        },
+        {
+            field: 'level',
+            headerName: 'Level',
+            valueGetter: (row: any) => PLAYER_LEVELS_MAP[row.level as keyof typeof PLAYER_LEVELS_MAP],
+        },
+        {
+            field: 'is_goalkeeper',
+            headerName: 'Goalkeeper',
+            valueGetter: (row: any) => row.is_goalkeeper ? 'Yes' : 'No',
+        },
+        {
+            field: 'confirmed',
+            headerName: 'Confirmed',
+            valueGetter: (row: any) => row.confirmed ? 'Yes' : 'No',
+        },
+        {
+            field: 'created_at',
+            headerName: 'Created At',
+            valueGetter: (row: any) => format(new Date(row.created_at), 'yyyy-MM-dd HH:mm:ss'),
+        }
     ];
+
+    const onDelete = (id: number) => {
+        router.delete(route('players.delete', id), {
+            preserveScroll: true,
+            onBefore: () => {
+                if (!confirm('Are you sure you want to delete this player?')) {
+                    return false;
+                }
+            }
+        })
+    }
+
+    const onEdit = (id: number) => {
+        router.get(route('players.edit', id));
+    }
+
 
     return (
         <AuthenticatedLayout
@@ -34,7 +68,12 @@ export default function Index({ auth }: PageProps) {
                         </Link>
                     </div>
                     <div className="relative overflow-x-auto">
-                        <Table headers={headers} rows={rows}/>
+                        <Table
+                            headers={headers}
+                            rows={players}
+                            onEdit={onEdit}
+                            onDelete={onDelete}
+                        />
                     </div>
                 </div>
             </div>

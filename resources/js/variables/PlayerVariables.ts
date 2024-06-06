@@ -12,3 +12,11 @@ export const PLAYER_LEVELS = [
     { value: PLAYER_LEVEL_GOOD, label: 'Good' },
     { value: PLAYER_LEVEL_VERY_GOOD, label: 'Very Good' },
 ];
+
+export const PLAYER_LEVELS_MAP = {
+    [PLAYER_LEVEL_VERY_POOR]: 'Very Poor',
+    [PLAYER_LEVEL_POOR]: 'Poor',
+    [PLAYER_LEVEL_AVERAGE]: 'Average',
+    [PLAYER_LEVEL_GOOD]: 'Good',
+    [PLAYER_LEVEL_VERY_GOOD]: 'Very Good',
+};

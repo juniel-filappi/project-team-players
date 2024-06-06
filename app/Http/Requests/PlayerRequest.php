@@ -6,7 +6,7 @@ use App\Enum\PlayerLevelEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
-class CreatePlayerRequest extends FormRequest
+class PlayerRequest extends FormRequest
 {
     public function rules(): array
     {

@@ -16,6 +16,17 @@ class PlayerData
     ) {
     }
 
+    public function toArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'user_id' => $this->userId,
+            'level' => $this->level,
+            'is_goalkeeper' => $this->isGoalkeeper,
+            'confirmed' => $this->confirmed,
+        ];
+    }
+
     public static function fromRequest(FormRequest $request): self
     {
         $validated = $request->validated();

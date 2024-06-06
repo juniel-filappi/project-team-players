@@ -3,11 +3,13 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { User } from '@/types';
+import { Warning } from "@phosphor-icons/react";
 
 export default function Authenticated({ user, header, children }: PropsWithChildren<{ user: User, header?: ReactNode }>) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const { flash } = usePage<{ flash: { message?: string } }>().props
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -124,7 +126,12 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
                 </header>
             )}
-
+            {flash.message && (
+                <div className="flex items-center gap-2 p-4 bg-yellow-200 border border-gray-200 rounded-lg left-0">
+                    <Warning className="inline-block w-5 h-5 text-yellow-800" />
+                    {flash.message}
+                </div>
+            )}
             <main>{children}</main>
         </div>
     );

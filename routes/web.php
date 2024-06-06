@@ -1,6 +1,9 @@
 <?php
 
-use App\Http\Controllers\CreatePlayerController;
+use App\Http\Controllers\Players\CreatePlayerController;
+use App\Http\Controllers\Players\DeletePlayerController;
+use App\Http\Controllers\Players\IndexPlayerController;
+use App\Http\Controllers\Players\UpdatePlayerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -25,11 +28,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::group(['prefix' => 'players'], function () {
-        Route::get('/', function () {
-            return Inertia::render('Players/Index');
-        })->name('players.index');
+        Route::get('/', IndexPlayerController::class)->name('players.index');
+        Route::delete('/{id}', DeletePlayerController::class)->name('players.delete');
         Route::get('/create', [CreatePlayerController::class, 'view'])->name('players.create');
         Route::post('/create', [CreatePlayerController::class, 'store'])->name('players.store');
+        Route::get('/edit/{id}', [UpdatePlayerController::class, 'view'])->name('players.edit');
+        Route::put('/edit/{id}', [UpdatePlayerController::class, 'update'])->name('players.update');
     });
 });
 

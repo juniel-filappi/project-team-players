@@ -37,6 +37,10 @@ class Player extends Model
         'level' => PlayerLevelEnum::class,
     ];
 
+    protected $hidden = [
+        'user_id',
+    ];
+
     public function draws(): BelongsToMany
     {
         return $this->belongsToMany(Draw::class, 'draw_player')
