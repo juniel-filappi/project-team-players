@@ -3,6 +3,7 @@
 use App\Http\Controllers\Players\CreatePlayerController;
 use App\Http\Controllers\Players\DeletePlayerController;
 use App\Http\Controllers\Players\IndexPlayerController;
+use App\Http\Controllers\Players\SortPlayerController;
 use App\Http\Controllers\Players\UpdatePlayerController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -34,6 +35,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/create', [CreatePlayerController::class, 'store'])->name('players.store');
         Route::get('/edit/{id}', [UpdatePlayerController::class, 'view'])->name('players.edit');
         Route::put('/edit/{id}', [UpdatePlayerController::class, 'update'])->name('players.update');
+
+        Route::post('/sort', SortPlayerController::class)->name('players.sort');
     });
 });
 

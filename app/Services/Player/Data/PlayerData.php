@@ -34,7 +34,7 @@ class PlayerData
         return new self(
             name: $validated['name'],
             userId: $request->user()->id,
-            level: PlayerLevelEnum::getLevelByValue($validated['level']),
+            level: PlayerLevelEnum::from($validated['level']),
             isGoalkeeper: $validated['is_goalkeeper'],
             confirmed: $validated['confirmed']
         );

@@ -3,11 +3,11 @@ import { Head, Link, router } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import Table from "@/Components/Table";
 import PrimaryButton from "@/Components/PrimaryButton";
-import { Player } from "@/interfaces/Player";
+import { IPlayer } from "@/interfaces/IPlayer";
 import { format } from "date-fns";
 import { PLAYER_LEVELS_MAP } from "@/variables/PlayerVariables";
 
-export default function Index({ auth, players }: PageProps<{ players: Player[] }>) {
+export default function Index({ auth, players }: PageProps<{ players: IPlayer[] }>) {
     const headers = [
         {
             field: 'name',

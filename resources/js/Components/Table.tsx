@@ -19,8 +19,7 @@ export default function Table({
 }: TableProps) {
     return (
         <table className="w-full text-sm text-center rtl:text-right text-gray-500">
-            <thead
-                className="text-xs text-gray-700 uppercase bg-gray-300">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-300">
             <tr>
                 {headers.map((header, index) => (
                     <th key={index} className="font-semibold p-2">{header.headerName}</th>

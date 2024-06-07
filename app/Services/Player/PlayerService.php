@@ -3,12 +3,14 @@
 namespace App\Services\Player;
 
 use App\Models\Draw;
+use App\Models\DrawPlayer;
 use App\Models\Player;
 use App\Models\Team;
 use App\Repositories\PlayerRepository;
 use App\Services\Player\Data\PlayerData;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 final class PlayerService
 {
@@ -44,46 +46,76 @@ final class PlayerService
 
     public function sort(int $userId, int $numPlayersPerTeam): array
     {
-        $confirmedPlayers = Player::where('confirmed', '=', true)
-            ->where('user_id', '=', $userId)
-            ->get();
+        DB::beginTransaction();
 
-        if ($confirmedPlayers->count() < $numPlayersPerTeam * 2) {
-            throw new Exception('Not enough players to sort');
+        try {
+            $confirmedPlayers = Player::where('confirmed', '=', true)
+                ->where('user_id', '=', $userId)
+                ->get();
+
+            if ($confirmedPlayers->count() < $numPlayersPerTeam * 2) {
+                throw new Exception('Not enough players to sort');
+            }
+
+            $draw = Draw::create();
+
+            $goalkeepers = $confirmedPlayers->where('is_goalkeeper', true);
+            $fieldPlayers = $confirmedPlayers->where('is_goalkeeper', false);
+
+            $teams = [];
+            $totalTeams = floor($confirmedPlayers->count() / $numPlayersPerTeam);
+
+            for ($i = 0; $i < $totalTeams; $i++) {
+                $teams[$i] = Team::create(['draw_id' => $draw->id, 'name' => 'Team ' . ($i + 1)]);
+                $teams[$i]->goalkeeper_assigned = false;
+            }
+
+            $teamIndex = 0;
+            foreach ($goalkeepers as $goalkeeper) {
+                if ($teams[$teamIndex]->has_goalkeeper) {
+                    $teamIndex = ($teamIndex + 1) % $totalTeams;
+
+                    continue;
+                }
+
+                DrawPlayer::create([
+                    'draw_id' => $draw->id,
+                    'team_id' => $teams[$teamIndex]->id,
+                    'player_id' => $goalkeeper->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                $teams[$teamIndex]->has_goalkeeper = true;
+                $teamIndex = ($teamIndex + 1) % $totalTeams;
+            }
+
+            foreach ($fieldPlayers as $player) {
+                // Adiciona o jogador ao time
+                if ($teams[$teamIndex]->players()->count() < $numPlayersPerTeam) {
+                    DrawPlayer::create([
+                        'draw_id' => $draw->id,
+                        'team_id' => $teams[$teamIndex]->id,
+                        'player_id' => $player->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+
+                $teamIndex = ($teamIndex + 1) % $totalTeams;
+            }
+
+            // Balancear níveis dos jogadores
+            foreach ($teams as $team) {
+                $team->players = $team->players()->orderBy('level', 'desc')->get();
+            }
+
+            DB::commit();
+
+            return $teams;
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
-
-        $draw = Draw::create();
-
-        $goalkeepers = $confirmedPlayers->where('is_goalkeeper', true);
-        $fieldPlayers = $confirmedPlayers->where('is_goalkeeper', false);
-
-        $teams = [];
-        $totalTeams = floor($confirmedPlayers->count() / $numPlayersPerTeam);
-
-        for ($i = 0; $i < $totalTeams; $i++) {
-            $teams[$i] = Team::create(['draw_id' => $draw->id, 'name' => 'Team ' . ($i + 1)]);
-        }
-
-        $teamIndex = 0;
-        foreach ($goalkeepers as $goalkeeper) {
-            $teams[$teamIndex]->players()->attach($goalkeeper->id);
-            $draw->players()->attach($goalkeeper->id, ['team_id' => $teams[$teamIndex]->id]);
-            $teamIndex = ($teamIndex + 1) % $totalTeams;
-        }
-
-        foreach ($fieldPlayers as $player) {
-            $teams[$teamIndex]->players()->attach($player->id);
-            $draw->players()->attach($player->id, ['team_id' => $teams[$teamIndex]->id]);
-            $teamIndex = ($teamIndex + 1) % $totalTeams;
-        }
-
-        // Balancear níveis dos jogadores (opcional)
-        foreach ($teams as $team) {
-            usort($team->players->toArray(), function ($a, $b) {
-                return $b['level'] - $a['level'];
-            });
-        }
-
-        return $teams;
     }
 }

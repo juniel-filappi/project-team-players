@@ -1,6 +1,6 @@
 import { PLAYER_LEVELS_MAP } from "@/variables/PlayerVariables";
 
-export interface Player {
+export interface IPlayer {
     id: number;
     name: string;
     level: keyof typeof PLAYER_LEVELS_MAP;

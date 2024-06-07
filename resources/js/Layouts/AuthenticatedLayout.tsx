@@ -9,7 +9,7 @@ import { Warning } from "@phosphor-icons/react";
 
 export default function Authenticated({ user, header, children }: PropsWithChildren<{ user: User, header?: ReactNode }>) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
-    const { flash } = usePage<{ flash: { message?: string } }>().props
+    const { flash, errors } = usePage<{ flash: { message?: string } }>().props
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -130,6 +130,14 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                 <div className="flex items-center gap-2 p-4 bg-yellow-200 border border-gray-200 rounded-lg left-0">
                     <Warning className="inline-block w-5 h-5 text-yellow-800" />
                     {flash.message}
+                </div>
+            )}
+            {errors && Object.values(errors).length > 0 && (
+                <div className="flex items-center gap-2 p-4 bg-red-200 border border-gray-200 rounded-lg left-0">
+                    <Warning className="inline-block w-5 h-5 text-red-800" />
+                    {Object.values(errors).map((error: string) => (
+                        <div key={error}>{error}</div>
+                    ))}
                 </div>
             )}
             <main>{children}</main>

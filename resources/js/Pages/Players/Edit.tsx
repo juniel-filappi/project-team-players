@@ -7,9 +7,9 @@ import { Transition } from "@headlessui/react";
 import React, { FormEventHandler } from "react";
 import SecondaryButton from "@/Components/SecondaryButton";
 import PlayerForm from "@/Pages/Players/PlayerForm";
-import { Player } from "@/interfaces/Player";
+import { IPlayer } from "@/interfaces/IPlayer";
 
-export default function Edit({ auth, player }: PageProps<{ player: Player }>) {
+export default function Edit({ auth, player }: PageProps<{ player: IPlayer }>) {
     const formData = useForm({
         name: player.name,
         level: player.level,
